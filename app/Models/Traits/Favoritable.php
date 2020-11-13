@@ -33,6 +33,14 @@ trait Favoritable
     }
 
 
+    public function unfavorite()
+    {
+        $attributes = ['user_id' => auth()->id()];
+
+        $this->favorites()->where($attributes)->get()->each->delete();
+    }
+
+
     /**
      * isFavorited
      *
@@ -43,6 +51,12 @@ trait Favoritable
         return !!$this->favorites->where('user_id', auth()->id())->count();
     }
 
+    public function getIsFavoritedAttribute()
+    {
+        return $this->isFavorited();
+    }
+
+
     /**
      * getFavoritesCountAttribute
      *
@@ -52,4 +66,11 @@ trait Favoritable
     {
         return $this->favorites->count();
     }
+
+    protected static function bootFavoritable()
+{
+    static::deleting(function ($model) {
+        $model->favorites->each->delete();
+    });
+}
 }

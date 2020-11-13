@@ -14,6 +14,7 @@ class Reply extends Model
 
     protected $guarded = [];
     protected $with = ['owner','favorites'];
+    protected $appends = ['favoritesCount','isFavorited'];
 
 
     public function owner()
@@ -25,4 +26,10 @@ class Reply extends Model
     {
         return $this->belongsTo(Thread::class);
     }
+
+    public function path()
+    {
+        return $this->thread->path() . "#reply-{$this->id}";
+    }
+
 }

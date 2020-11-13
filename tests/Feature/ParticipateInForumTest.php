@@ -56,4 +56,62 @@ class ParticipateInForumTest extends TestCase
         // Then their reply should be visible on the page
         $this->get($thread->path())->assertSee($reply->body);
     }
+
+    /**
+     * @test
+     */
+    public function unauthorized_users_cannot_delete_replies()
+    {
+        $this->withExceptionHandling();
+
+        $reply = create('App\Models\Reply');
+
+        $this->delete("/replies/{$reply->id}")->assertRedirect("login");
+    }
+
+    /**
+     * @test
+     */
+    public function authorized_users_can_delete_replies()
+    {
+        $this->signIn();
+
+        $reply = create('App\Models\Reply',['user_id' => auth()->id()]);
+
+        $this->delete("replies/{$reply->id}")->assertStatus(302);
+
+        $this->assertDatabaseMissing('replies',['id' => $reply->id]);
+
+    }
+
+    /**
+     * @test
+     */
+    public function unauthorized_users_cannot_update_replies()
+    {
+        $this->withExceptionHandling();
+
+        $reply = create('App\Models\Reply');
+
+        $this->patch("/replies/{$reply->id}")->assertRedirect('login');
+
+        $this->signIn()->patch("/replies/{$reply->id}")->assertStatus(403);
+
+    }
+
+    /**
+     * @test
+     */
+    public function authorized_users_can_update_replies()
+    {
+        $this->signIn();
+
+        $reply = create("App\Models\Reply",["user_id" => auth()->id()]);
+
+        $updateReply = "You have been changed,foo.";
+
+        $this->patch("/replies/{$reply->id}",["id" => $reply->id,"body" => $updateReply]);
+
+        $this->assertDatabaseHas('replies',['id' => $reply->id, 'body' => $updateReply]);
+    }
 }

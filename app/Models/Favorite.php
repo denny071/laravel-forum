@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Traits\RecordsActivity;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Favorite extends Model
 {
-    use HasFactory;
+    use HasFactory,RecordsActivity;
 
     protected $guarded = [];
 
@@ -32,4 +33,7 @@ class Favorite extends Model
     {
         return $this->morphTo();
     }
+
+
+
 }
