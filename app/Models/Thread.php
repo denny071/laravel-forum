@@ -69,14 +69,45 @@ class Thread extends Model
     {
         parent::boot();
 
-        static::addGlobalScope('replyCount', function($builder){
-            $builder->withCount('replies');
-        });
 
         static::deleting(function ($thread) {
             $thread->replies->each->delete();
         });
 
+    }
+
+    /**
+     * 订阅主题
+     *
+     * @param int $userId
+     * @return void
+     */
+    public function subscribe($userId = null)
+    {
+        $this->subcriptions()->create([
+            'user_id' => $userId ?: auth()->id()
+        ]);
+
+        return $this;
+    }
+
+
+    /**
+     * 取消订阅
+     *
+     * @param  int $userId
+     * @return void
+     */
+    public function unsubscribe($userId = null)
+    {
+        $this->subcriptions()
+             ->where('user_id', $userId ?: auth()->id())
+             ->delete();
+    }
+
+    public function subcriptions()
+    {
+        return $this->hasMany(ThreadSubscription::class);
     }
 
 

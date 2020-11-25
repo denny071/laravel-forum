@@ -31,6 +31,7 @@
                         @endif
 
                         <li><a href="/threads?popularity=1">热门帖子</a> </li>
+                        <li><a href="/threads?unanswered=1">回复贴子</a> </li>
                     </ul>
                 </li>
 

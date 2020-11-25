@@ -2,6 +2,7 @@
 
 namespace Tests\Unit;
 
+use App\Models\Thread;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -73,5 +74,39 @@ class ThreadTest extends TestCase
             'user_id' => 1
         ]);
         $this->assertCount(1,$this->thread->replies);
+    }
+
+
+    /** @test */
+    public function a_thread_can_be_subscribed_to()
+    {
+        // Given we have a thread
+        $thread =  create("App\Models\Thread");
+        // And an authenticated user
+        $this->signIn();
+        // When thre user subscribes to the thread
+        $thread->subscribe();
+        // Then we should be able to fetch all threads that the use has subscribed to.
+        $this->assertEquals(
+            1,
+            $thread->subcriptions()->where('user_id',auth()->id())->count()
+        );
+    }
+
+    /** @test */
+    public function a_thread_can_be_unsubscribed_from()
+    {
+        // Given we have a thread
+        $thread = create('App\Models\Thread');
+
+        // Add a user who is subscribed to the thread
+        $thread->subscribe($userId = 1);
+
+        $thread->unsubscribe($userId);
+
+        $this->assertEquals(
+            0,
+            $thread->subcriptions()->where('user_id',auth()->id())->count()
+        );
     }
 }

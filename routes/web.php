@@ -29,6 +29,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
     Route::delete("/replies/{reply}","RepliesController@destroy");
     Route::post("/replies/{reply}/favorites", "FavoritesController@store");
     Route::delete('/replies/{reply}/favorites','FavoritesController@destroy');
+    Route::post('/threads/{channel}/{thread}/subscriptions','ThreadSubscriptionsController@store');
 
     Route::get("/profiles/{user}",'ProfilesController@show')->name('profile');
     Route::delete("threads/{channel}/{thread}","ThreadsController@destroy");
