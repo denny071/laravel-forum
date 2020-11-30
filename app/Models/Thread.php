@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Traits\RecordsActivity;
+use App\Notifications\ThreadWasUpdated;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -12,6 +13,15 @@ class Thread extends Model
 
     protected $guarded = [];
     protected $with = ['creator','channel'];
+    protected $appends = ['isSubscribedTo'];
+
+
+    public function getIsSubscribedToAttribute()
+    {
+        return $this->subscriptions()
+            ->where('user_id',auth()->id())
+            ->exists();
+    }
 
     /**
      * @return string 跳转路径
@@ -58,7 +68,15 @@ class Thread extends Model
      */
     public function addReply($reply)
     {
-        return $this->replies()->create($reply);
+        $reply = $this->replies()->create($reply);
+
+        // Prepare notifications for all subscribers
+        $this->subscriptions
+            ->filter (function ($sub) use ($reply){
+                return $sub->user_id != $reply->user_id;
+            })->each->notify($reply);
+
+        return $reply;
     }
 
 
@@ -84,7 +102,7 @@ class Thread extends Model
      */
     public function subscribe($userId = null)
     {
-        $this->subcriptions()->create([
+        $this->subscriptions()->create([
             'user_id' => $userId ?: auth()->id()
         ]);
 
@@ -100,12 +118,12 @@ class Thread extends Model
      */
     public function unsubscribe($userId = null)
     {
-        $this->subcriptions()
+        $this->subscriptions()
              ->where('user_id', $userId ?: auth()->id())
              ->delete();
     }
 
-    public function subcriptions()
+    public function subscriptions()
     {
         return $this->hasMany(ThreadSubscription::class);
     }

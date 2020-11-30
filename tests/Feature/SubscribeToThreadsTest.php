@@ -14,10 +14,32 @@ class SubscribeToThreadsTest extends TestCase
     /** @test */
     public function a_user_can_subscribe_to_threads()
     {
-        $thread = create("App\Models");
+        $this->signIn();
 
-        $this->post($thread->path().'/subscriptions');
+        // Given we have a thread
+        $thread = create('App\Models\Thread');
 
-        $this->assertCount(1,$thread->subscriptions);
+        // And the user subscribes to the thread
+        $this->post($thread->path() . '/subscriptions');
+
+        // A notification should be prepared for the user.
+        $this->assertCount(1, $thread->fresh()->subscriptions);
+    }
+
+    /**
+     * @test
+     *
+     */
+    public function a_user_can_unsubscribe_from_threads()
+    {
+        $this->signIn();
+
+        $thread = create("App\Models\Thread");
+
+        $this->post($thread->path()."/subscriptions");
+
+        $this->delete($thread->path() ."/subscriptions");
+
+        $this->assertCount(1, $thread->fresh()->subscriptions);
     }
 }

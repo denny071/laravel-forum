@@ -9,6 +9,7 @@ class ThreadSubscriptionsController extends Controller
 {
    public function store($channelId, Thread $thread)
    {
+
         $thread->subscribe();
    }
 }

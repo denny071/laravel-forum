@@ -35,7 +35,10 @@
                     <div class="panel-body">
                         <p>
                             <a href="#">{{ $thread->creator->name }}</a> 发布于 {{ $thread->created_at->diffForHumans() }},
-                            当前共有 <span v-text="repliesCount"></span> 个回复。
+                            当前共有 <span v-text="repliesCount"></span> 个回复 。
+                        </p>
+                        <p>
+                            <subscribe-button :active="{{ json_encode($thread->isSubscribedTo) }}"></subscribe-button>
                         </p>
                     </div>
                 </div>
