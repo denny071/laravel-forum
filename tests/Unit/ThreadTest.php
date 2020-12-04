@@ -125,4 +125,23 @@ class ThreadTest extends TestCase
             $thread->subscriptions()->where('user_id',auth()->id())->count()
         );
     }
+
+    /** @test */
+    public function a_thread_can_check_if_the_authenticated_user_has_read_all_replies()
+    {
+        $this->signIn();
+
+        $thread = create("App\Models\Thread");
+
+        tap(auth()->user(), function ($user) use ($thread){
+            // 第标题进行加粗显示
+            $this->assertTrue($thread->hasUpdatesFor($user));
+            // 浏览话题
+            $user->read($thread);
+            // 取消加粗
+            $this->assertFalse($thread->hasUpdatesFor($user));
+        });
+    }
+
+
 }
