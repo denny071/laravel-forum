@@ -29,3 +29,4 @@ class ChannelFactory extends Factory
         ];
     }
 }
+// App\Models\User::first()->notify(new App\Notifications\ThreadWasUpdated(App\Models\Thread::first(),App\Models\Reply::first()));
