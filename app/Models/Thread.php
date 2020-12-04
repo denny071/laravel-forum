@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Events\ThreadHasNewReply;
 use App\Models\Traits\RecordsActivity;
 use App\Notifications\ThreadWasUpdated;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -70,15 +71,21 @@ class Thread extends Model
     {
         $reply = $this->replies()->create($reply);
 
-        // Prepare notifications for all subscribers
-        $this->subscriptions
-            ->filter (function ($sub) use ($reply){
-                return $sub->user_id != $reply->user_id;
-            })->each->notify($reply);
+        $this->notifySubscribers($reply);
+        // event(new ThreadHasNewReply($this, $reply));
 
         return $reply;
     }
 
+
+    public function notifySubscribers($reply)
+    {
+        $this->subscriptions
+            ->where("user_id","!=",$reply->user_id)
+            ->each
+            ->notify($reply);
+
+    }
 
     /**
      * boot
