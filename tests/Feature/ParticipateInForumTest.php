@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use Error;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -118,4 +119,20 @@ class ParticipateInForumTest extends TestCase
 
         $this->assertDatabaseHas('replies',['id' => $reply->id, 'body' => $updateReply]);
     }
+
+
+
+     /** @test */
+     public function replies_contain_spam_may_not_be_created()
+     {
+         $this->signIn();
+
+         $thread = create('App\Models\Thread');
+         $reply = make('App\Models\Reply',[
+            'body' => 'something frobidden'
+         ]);
+
+         $this->expectException(Error::class);
+         $this->post($thread->path() . '/replies',$reply->toArray());
+     }
 }

@@ -138,7 +138,7 @@ class CreateThreadsTest extends TestCase
     }
 
     /**
-     * @test
+     * @test相似度百分之多少算侵权
      */
     public function authorized_users_can_delete_threads()
     {
