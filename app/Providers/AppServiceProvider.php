@@ -15,14 +15,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        Carbon::setLocale('zh');
-        // view composer
-        \view()->composer("*", function ($view) {
-            $channels = \Cache::rememberForever('channels', function () {
-                return Channel::all();
-            });
-            $view->with("channels",$channels);
-        });
+        // Carbon::setLocale('zh');
+        // // view composer
+        // \view()->composer("*", function ($view) {
+        //     $channels = \Cache::rememberForever('channels', function () {
+        //         return Channel::all();
+        //     });
+        //     $view->with("channels",$channels);
+        // });
     }
 
     /**
@@ -35,5 +35,16 @@ class AppServiceProvider extends ServiceProvider
         if ($this->app->isLocal()) {
              $this->app->register(\Barryvdh\Debugbar\ServiceProvider::class);
         }
+        Carbon::setLocale('zh');
+        // view composer
+        \view()->composer("*", function ($view) {
+            $channels = \Cache::rememberForever('channels', function () {
+                return Channel::all();
+            });
+            $view->with("channels",$channels);
+        });
+
+        \Validator::extend("spamfree", "App\Rules\SpamFree@passes");
+
     }
 }

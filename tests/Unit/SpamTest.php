@@ -2,8 +2,8 @@
 
 namespace Tests\Unit;
 
-use App\Models\Spam;
-use Error;
+use App\Inspections\Spam;
+use Exception;
 use PHPUnit\Framework\TestCase;
 
 class SpamTest extends TestCase
@@ -24,7 +24,7 @@ class SpamTest extends TestCase
 
         $this->assertFalse($spam->detect("Innocent reply here."));
 
-        // $this->expectException(Error::class);
+        $this->expectException(Exception::class);
 
         $spam->detect('something forbidden');
     }
@@ -36,7 +36,7 @@ class SpamTest extends TestCase
 
         $this->assertFalse($spam->detect("Innocent reply here."));
 
-        // $this->expectException(Error::class);
+        $this->expectException(Exception::class);
 
         $spam->detect('Hello word aaaaaaaaaa');
     }

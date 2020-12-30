@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use Error;
+use Exception;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -20,8 +20,9 @@ class ParticipateInForumTest extends TestCase
         $thread = create('App\Models\Thread');
         $reply = make('App\Models\Reply', ['body' => null]);
 
-        $this->post($thread->path()."/replies",$reply->toArray())
-            ->assertSessionHasErrors('body');
+        $this->post($thread->path() . '/replies', $reply->toArray())
+             ->assertStatus(422);
+
     }
 
     /** @test */
@@ -129,10 +130,29 @@ class ParticipateInForumTest extends TestCase
 
          $thread = create('App\Models\Thread');
          $reply = make('App\Models\Reply',[
-            'body' => 'something frobidden'
+            'body' =>   'something forbidden'
          ]);
 
-         $this->expectException(Error::class);
-         $this->post($thread->path() . '/replies',$reply->toArray());
+
+         $this->post($thread->path() . '/replies',$reply->toArray())
+         ->assertStatus(422);
+     }
+
+     /** @test */
+     public function users_may_only_reply_a_maximum_of_once_per_minute()
+     {
+         $this->signIn();
+
+         $thread = create("App\Models\Thread");
+         $reply = make("App\Models\Reply",[
+             'body' => "My simple reply."
+         ]);
+
+         $this->post($thread->path() . '/replies', $reply->toArray())->assertStatus(200);
+
+         $this->post($thread->path() . '/replies', $reply->toArray())->assertStatus(422);
+
+
+
      }
 }
